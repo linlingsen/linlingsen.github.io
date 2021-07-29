@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search>
+  <entry>
+    <title>docker日常使用</title>
+    <url>/2021/07/26/docker/</url>
+    <content><![CDATA[<h2 id="docker服务创建的文件和文件夹，host具有相同的权限"><a href="#docker服务创建的文件和文件夹，host具有相同的权限" class="headerlink" title="docker服务创建的文件和文件夹，host具有相同的权限"></a>docker服务创建的文件和文件夹，host具有相同的权限</h2><ol>
+<li>近日想搭个人静态网站，搜索最快的实现方式，随即就看到了hexo这种技术方案。发挥程序员最大特点“懒”，故想使用docker制作个运行环境，免除重装系统时的痛苦或者快速分享给周围朋友，岂不美哉。</li>
+<li>我的想法是：markdown的编写还是在host上完成，运行docker服务编译生成静态网站文件。这就遇到了点问题！<blockquote>
+<p>当我们用如下的命令启动docker服务时, 在容器内[container dir]创建文件或者文件夹，所属用户和组必然是root。<br>那么，在host这侧必然是只读状态，除非host也是root用户。</p>
+</blockquote>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">docker run -v [host dir]:[container dir] -it [docker_image] /bin/bash</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>解决方式，通过创建服务时，传入host的用户id和组id</p>
+</blockquote>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">docker run -v [host dir]:[container dir] -u [uid]:[gid] -it [docker_image] /bin/bash</span><br></pre></td></tr></table></figure></li>
+</ol>
+]]></content>
+      <categories>
+        <category>日常</category>
+      </categories>
+      <tags>
+        <tag>docker</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>linux日常</title>
+    <url>/2021/07/26/linux/</url>
+    <content><![CDATA[<h2 id="查看当前linux下的用户信息"><a href="#查看当前linux下的用户信息" class="headerlink" title="查看当前linux下的用户信息"></a>查看当前linux下的用户信息</h2><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">cat /etc/passwd</span><br><span class="line"><span class="comment"># 用户名:加密密码:用户id:组id:用户信息:家目录:shell类型</span></span><br><span class="line">root:x:0:0:root:/root:/bin/bash</span><br><span class="line">daemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin</span><br><span class="line">bin:x:2:2:bin:/bin:/usr/sbin/nologin</span><br><span class="line">sys:x:3:3:sys:/dev:/usr/sbin/nologin</span><br><span class="line"></span><br><span class="line"><span class="comment"># 可以如下命令查找当前用户</span></span><br><span class="line">cat /etc/passwd | grep <span class="variable">$USER</span></span><br></pre></td></tr></table></figure>
+<h2 id="sed替换指定文本"><a href="#sed替换指定文本" class="headerlink" title="sed替换指定文本"></a>sed替换指定文本</h2><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">cat replace.txt</span><br><span class="line">https://github.com/xxx/yyy.git</span><br><span class="line"></span><br><span class="line"><span class="comment"># 欲将github.com替换为gitclone.com/github.com</span></span><br><span class="line">sed -i <span class="string">&#x27;s#github.com#gitclone.com/github.com#&#x27;</span> replace.txt</span><br><span class="line"><span class="comment"># 欲生成新文件</span></span><br><span class="line">sed -i <span class="string">&#x27;s#github.com#gitclone.com/github.com#&#x27;</span> replace.txt &gt; new.txt</span><br></pre></td></tr></table></figure>
+
+]]></content>
+      <categories>
+        <category>日常</category>
+      </categories>
+      <tags>
+        <tag>shell</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>gdb的基本使用</title>
+    <url>/2021/07/26/gdb/</url>
+    <content><![CDATA[<blockquote>
+<p>近期在linux下的开发项目告一阶段, 为了防止手生，特此以写博客的形式, 将基本知识再次复习一下。</p>
+</blockquote>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 使用test.cpp作为例子, 代码如下</span></span><br><span class="line">cat test.cpp</span><br></pre></td></tr></table></figure>
+<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">demo</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> i = <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">for</span>(; i &lt; <span class="number">100</span>; ++i) &#123;</span><br><span class="line">       <span class="keyword">if</span>(<span class="number">0</span> == i%<span class="number">2</span>) &#123;</span><br><span class="line">          std::cout &lt;&lt; <span class="string">&quot;0 == i%2&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">       &#125; <span class="keyword">else</span> <span class="keyword">if</span>(<span class="number">0</span> == i%<span class="number">3</span>) &#123;</span><br><span class="line">          std::cout &lt;&lt; <span class="string">&quot;0 == i%3&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">       &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">          <span class="comment">// do nothing</span></span><br><span class="line">       &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">void</span> <span class="built_in">new_buff</span>() &#123;</span><br><span class="line">    <span class="keyword">char</span>* pb = <span class="keyword">new</span> <span class="keyword">char</span>[<span class="number">16</span>];</span><br><span class="line">    pb[<span class="number">0</span>] = <span class="number">1</span>;</span><br><span class="line">    pb[<span class="number">1</span>] = <span class="number">2</span>;</span><br><span class="line">    pb[<span class="number">2</span>] = <span class="number">3</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">char</span>* pbsw = *(&amp;pb);</span><br><span class="line"></span><br><span class="line">    pb = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">delete</span> pbsw;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">void</span>)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">demo</span>();</span><br><span class="line"></span><br><span class="line">    <span class="built_in">new_buff</span>();</span><br><span class="line"></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;hello, guests&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="设置-查看启动参数"><a href="#设置-查看启动参数" class="headerlink" title="设置/查看启动参数"></a>设置/查看启动参数</h2><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">(gdb) <span class="built_in">set</span> args hello world</span><br><span class="line">(gdb) show args</span><br></pre></td></tr></table></figure>
+<h2 id="改变调试时变量的值"><a href="#改变调试时变量的值" class="headerlink" title="改变调试时变量的值"></a>改变调试时变量的值</h2><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">set</span> var [variable]=[value]</span><br></pre></td></tr></table></figure>
+<h2 id="断点"><a href="#断点" class="headerlink" title="断点"></a>断点</h2><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 生成调试信息</span></span><br><span class="line">g++ -g test.cpp -o <span class="built_in">test</span></span><br><span class="line">gdb <span class="built_in">test</span></span><br></pre></td></tr></table></figure>
+<span id="more"></span>
+<p><img src="/2021/07/26/gdb/gdb_entry.png" alt="entry"></p>
+<h3 id="设置-查看断点"><a href="#设置-查看断点" class="headerlink" title="设置/查看断点"></a>设置/查看断点</h3><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">(gdb) b demo</span><br><span class="line">(gdb) b main</span><br><span class="line">(gdb) info breakpoints</span><br><span class="line">Num     Type           Disp Enb Address            What</span><br><span class="line">1       breakpoint     keep y   0x00000000000011a9 <span class="keyword">in</span> demo() at test.cpp:3</span><br><span class="line">2       breakpoint     keep y   0x000000000000125b <span class="keyword">in</span> main() at test.cpp:15</span><br><span class="line">(gdb)</span><br></pre></td></tr></table></figure>
+<h3 id="disable-enable某个断点"><a href="#disable-enable某个断点" class="headerlink" title="disable/enable某个断点"></a>disable/enable某个断点</h3><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">(gdb) <span class="built_in">disable</span> breakpoints 1</span><br><span class="line">(gdb) info breakpoints</span><br><span class="line">Num     Type           Disp Enb Address            What</span><br><span class="line"><span class="comment"># 可以看到对于断点1其Enb状态由y变为n</span></span><br><span class="line">1       breakpoint     keep n   0x00000000000011a9 <span class="keyword">in</span> demo() at test.cpp:3</span><br><span class="line">2       breakpoint     keep y   0x000000000000125b <span class="keyword">in</span> main() at test.cpp:15</span><br><span class="line">(gdb) <span class="built_in">enable</span> breakpoints 1</span><br><span class="line">(gdb) info breakpoints</span><br><span class="line">Num     Type           Disp Enb Address            What</span><br><span class="line"><span class="comment"># 可以看到对于断点1其Enb状态由n变为y</span></span><br><span class="line">1       breakpoint     keep y   0x00000000000011a9 <span class="keyword">in</span> demo() at test.cpp:3</span><br><span class="line">2       breakpoint     keep y   0x000000000000125b <span class="keyword">in</span> main() at test.cpp:15</span><br><span class="line">(gdb)</span><br></pre></td></tr></table></figure>
+<h3 id="条件断点"><a href="#条件断点" class="headerlink" title="条件断点"></a>条件断点</h3><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">(gdb) b 6 <span class="keyword">if</span> i == 10 <span class="comment"># 当i更新为10时, 断点生效</span></span><br><span class="line">(gdb) info breakpoints</span><br><span class="line">Num     Type           Disp Enb Address            What</span><br><span class="line">1       breakpoint     keep y   0x0000000000001226 <span class="keyword">in</span> demo() at test.cpp:6</span><br><span class="line">        stop only <span class="keyword">if</span> i == 10</span><br><span class="line">(gdb)</span><br></pre></td></tr></table></figure>
+<h3 id="删除断点"><a href="#删除断点" class="headerlink" title="删除断点"></a>删除断点</h3><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 查看clear和delete的解释说明</span></span><br><span class="line">(gdb) <span class="built_in">help</span> clear <span class="comment"># Clear breakpoint at specified location. Argument may be a linespec, explicit, or address location as described below.</span></span><br><span class="line">(gdb) <span class="built_in">help</span> delete <span class="comment"># Delete all or some breakpoints. Arguments are breakpoint numbers with spaces in between.</span></span><br><span class="line">(gdb)</span><br></pre></td></tr></table></figure>
+<h3 id="观察点watchpoint"><a href="#观察点watchpoint" class="headerlink" title="观察点watchpoint"></a>观察点watchpoint</h3><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">(gdb) <span class="built_in">help</span> watch <span class="comment"># 可以监视变量什么时候被修改</span></span><br><span class="line">Set a watchpoint <span class="keyword">for</span> an expression. A watchpoint stops execution of your program whenever the value of an expression changes.</span><br><span class="line">(gdb) p pb</span><br><span class="line"><span class="variable">$10</span> = 0x55555556b2c0 <span class="string">&quot;&quot;</span></span><br><span class="line">(gdb) watch *0x55555556b2c0</span><br><span class="line">Hardware watchpoint 15: *0x55555556b2c0</span><br><span class="line">(gdb) c</span><br><span class="line">Continuing.</span><br><span class="line"></span><br><span class="line">Hardware watchpoint 15: *0x55555556b2c0</span><br><span class="line"></span><br><span class="line">Old value = 0</span><br><span class="line">New value = 1</span><br><span class="line">new_buff () at test.cpp:19</span><br><span class="line">19          pb[1] = 2;</span><br><span class="line">(gdb) c</span><br><span class="line">Continuing.</span><br><span class="line"></span><br><span class="line">Hardware watchpoint 15: *0x55555556b2c0</span><br><span class="line"></span><br><span class="line">Old value = 1</span><br><span class="line">New value = 513</span><br><span class="line">new_buff () at test.cpp:20</span><br><span class="line">20          pb[2] = 3;</span><br><span class="line">(gdb) </span><br></pre></td></tr></table></figure>
+<h2 id="栈帧frame"><a href="#栈帧frame" class="headerlink" title="栈帧frame"></a>栈帧frame</h2><p>在研究栈帧之前，先复习一下可执行程序载入内存时的布局，以linux举例说明。<br><img src="/2021/07/26/gdb/linuxFlexibleAddressSpaceLayout.png" alt="elf memory layout"></p>
+]]></content>
+      <categories>
+        <category>日常</category>
+      </categories>
+      <tags>
+        <tag>gdb</tag>
+      </tags>
+  </entry>
+</search>
