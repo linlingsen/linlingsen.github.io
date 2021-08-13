@@ -30,6 +30,20 @@ fastcall_f函数汇编代码<figure class="highlight plaintext"><table><tr><td c
       </tags>
   </entry>
   <entry>
+    <title>linux日常</title>
+    <url>/2021/07/26/linux/</url>
+    <content><![CDATA[<h2 id="查看当前linux下的用户信息"><a href="#查看当前linux下的用户信息" class="headerlink" title="查看当前linux下的用户信息"></a>查看当前linux下的用户信息</h2><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">cat /etc/passwd</span><br><span class="line"><span class="comment"># 用户名:加密密码:用户id:组id:用户信息:家目录:shell类型</span></span><br><span class="line">root:x:0:0:root:/root:/bin/bash</span><br><span class="line">daemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin</span><br><span class="line">bin:x:2:2:bin:/bin:/usr/sbin/nologin</span><br><span class="line">sys:x:3:3:sys:/dev:/usr/sbin/nologin</span><br><span class="line"></span><br><span class="line"><span class="comment"># 可以如下命令查找当前用户</span></span><br><span class="line">cat /etc/passwd | grep <span class="variable">$USER</span></span><br></pre></td></tr></table></figure>
+<h2 id="sed替换指定文本"><a href="#sed替换指定文本" class="headerlink" title="sed替换指定文本"></a>sed替换指定文本</h2><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">cat replace.txt</span><br><span class="line">https://github.com/xxx/yyy.git</span><br><span class="line"></span><br><span class="line"><span class="comment"># 欲将github.com替换为gitclone.com/github.com</span></span><br><span class="line">sed -i <span class="string">&#x27;s#github.com#gitclone.com/github.com#&#x27;</span> replace.txt</span><br><span class="line"><span class="comment"># 欲生成新文件</span></span><br><span class="line">sed -i <span class="string">&#x27;s#github.com#gitclone.com/github.com#&#x27;</span> replace.txt &gt; new.txt</span><br></pre></td></tr></table></figure>
+
+]]></content>
+      <categories>
+        <category>日常</category>
+      </categories>
+      <tags>
+        <tag>shell</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>gdb的基本使用</title>
     <url>/2021/07/26/gdb/</url>
     <content><![CDATA[<blockquote>
@@ -99,20 +113,6 @@ fastcall_f函数汇编代码<figure class="highlight plaintext"><table><tr><td c
       </categories>
       <tags>
         <tag>docker</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>linux日常</title>
-    <url>/2021/07/26/linux/</url>
-    <content><![CDATA[<h2 id="查看当前linux下的用户信息"><a href="#查看当前linux下的用户信息" class="headerlink" title="查看当前linux下的用户信息"></a>查看当前linux下的用户信息</h2><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">cat /etc/passwd</span><br><span class="line"><span class="comment"># 用户名:加密密码:用户id:组id:用户信息:家目录:shell类型</span></span><br><span class="line">root:x:0:0:root:/root:/bin/bash</span><br><span class="line">daemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin</span><br><span class="line">bin:x:2:2:bin:/bin:/usr/sbin/nologin</span><br><span class="line">sys:x:3:3:sys:/dev:/usr/sbin/nologin</span><br><span class="line"></span><br><span class="line"><span class="comment"># 可以如下命令查找当前用户</span></span><br><span class="line">cat /etc/passwd | grep <span class="variable">$USER</span></span><br></pre></td></tr></table></figure>
-<h2 id="sed替换指定文本"><a href="#sed替换指定文本" class="headerlink" title="sed替换指定文本"></a>sed替换指定文本</h2><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">cat replace.txt</span><br><span class="line">https://github.com/xxx/yyy.git</span><br><span class="line"></span><br><span class="line"><span class="comment"># 欲将github.com替换为gitclone.com/github.com</span></span><br><span class="line">sed -i <span class="string">&#x27;s#github.com#gitclone.com/github.com#&#x27;</span> replace.txt</span><br><span class="line"><span class="comment"># 欲生成新文件</span></span><br><span class="line">sed -i <span class="string">&#x27;s#github.com#gitclone.com/github.com#&#x27;</span> replace.txt &gt; new.txt</span><br></pre></td></tr></table></figure>
-
-]]></content>
-      <categories>
-        <category>日常</category>
-      </categories>
-      <tags>
-        <tag>shell</tag>
       </tags>
   </entry>
 </search>
