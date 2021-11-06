@@ -1,23 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>以汇编的角度理解事物</title>
-    <url>/2021/08/07/assemble/</url>
+    <title>以汇编的角度理解调用约定</title>
+    <url>/2021/08/07/assemble_cc/</url>
     <content><![CDATA[<blockquote>
-<p>在正文行文之前，分享一个在线编译compiler explorer <a href="https://godbolt.org/">https://godbolt.org</a>，可以选择编译器类型及属性设置<br><img src="/2021/08/07/assemble/complier_explorer.png" alt="online_complier"></p>
+<p>在正文行文之前，分享一个在线编译compiler explorer <a href="https://godbolt.org/">https://godbolt.org</a>，可以选择编译器类型及属性设置<br><img src="/2021/08/07/assemble_cc/complier_explorer.png" alt="online_complier"></p>
 </blockquote>
 <h2 id="汇编看调用约定"><a href="#汇编看调用约定" class="headerlink" title="汇编看调用约定"></a>汇编看调用约定</h2><p>今天先看一下3种调用约定<code>cdecl</code>，<code>stdcall</code>，<code>fastcall</code></p>
 <span id="more"></span>
-<h3 id="X86模式下的调用约定"><a href="#X86模式下的调用约定" class="headerlink" title="X86模式下的调用约定"></a>X86模式下的调用约定</h3><ul>
-<li><strong>linux</strong><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 生成32位intel风格的汇编代码</span></span><br><span class="line">g++ -S -m32 -masm=intel test.cpp</span><br></pre></td></tr></table></figure>
+<h3 id="X86模式下的调用约定"><a href="#X86模式下的调用约定" class="headerlink" title="X86模式下的调用约定"></a>X86模式下的调用约定</h3><h4 id="linux"><a href="#linux" class="headerlink" title="linux"></a>linux</h4><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 生成32位intel风格的汇编代码</span></span><br><span class="line">g++ -S -m32 -masm=intel test.cpp</span><br></pre></td></tr></table></figure>
 <figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="keyword">int</span> __attribute__((__cdecl__)) <span class="built_in">cdecl_f</span>(<span class="keyword">int</span> c1, <span class="keyword">int</span> c2) &#123;</span><br><span class="line">   <span class="keyword">return</span> c1 + c2;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> __attribute__((__stdcall__)) <span class="built_in">stdcall_f</span>(<span class="keyword">int</span> s1, <span class="keyword">int</span> s2) &#123;</span><br><span class="line">      <span class="keyword">return</span> s1*s2;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> __attribute__((__fastcall__)) <span class="built_in">fastcall_f</span>(<span class="keyword">int</span> f1, <span class="keyword">int</span> f2, <span class="keyword">int</span> f3, <span class="keyword">int</span> f4, <span class="keyword">int</span> f5, <span class="keyword">int</span> f6, <span class="keyword">int</span> f7) &#123;</span><br><span class="line">      <span class="keyword">return</span> f1 + f2 + f3 + f4 + f5 + f6 + f7;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="built_in">cdecl_f</span>(<span class="number">1</span>, <span class="number">2</span>);</span><br><span class="line">    <span class="built_in">stdcall_f</span>(<span class="number">4</span>, <span class="number">5</span>);</span><br><span class="line">    <span class="built_in">fastcall_f</span>(<span class="number">8</span>, <span class="number">9</span>, <span class="number">10</span>, <span class="number">11</span>, <span class="number">12</span>, <span class="number">13</span>, <span class="number">14</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-main函数的汇编代码段<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">main:</span><br><span class="line">.LFB3:</span><br><span class="line">▸   .cfi_startproc</span><br><span class="line">▸   endbr32</span><br><span class="line">▸   push▸   ebp</span><br><span class="line">▸   .cfi_def_cfa_offset 8</span><br><span class="line">▸   .cfi_offset 5, -8</span><br><span class="line">▸   mov▸ebp, esp</span><br><span class="line">▸   .cfi_def_cfa_register 5</span><br><span class="line">▸   call▸   __x86.get_pc_thunk.ax</span><br><span class="line">▸   add▸eax, OFFSET FLAT:_GLOBAL_OFFSET_TABLE_</span><br><span class="line"></span><br><span class="line">▸   push▸   2            ; 2压入栈，esp下移4字节</span><br><span class="line">▸   push▸   1            ; 1压入栈，esp下移4字节</span><br><span class="line">▸   call▸   _Z7cdecl_fii ; call cdecl_f函数</span><br><span class="line">▸   add▸esp, 8           ; esp上移8字节</span><br><span class="line">; 对于__cdecl__调用约定函数，函数调用者清理栈</span><br><span class="line">; 参数压栈方向: 从右向左</span><br><span class="line"></span><br><span class="line">▸   push▸   5</span><br><span class="line">▸   push▸   4</span><br><span class="line">▸   call▸   _Z9stdcall_fii</span><br><span class="line">; 对于__stdcall__调用约定，没看到函数调用者清理栈，参看stdcall_f汇编代码</span><br><span class="line">; 参数压栈方向: 从右向左</span><br><span class="line"></span><br><span class="line">▸   push▸   14</span><br><span class="line">▸   push▸   13</span><br><span class="line">▸   push▸   12</span><br><span class="line">▸   push▸   11</span><br><span class="line">▸   push▸   10</span><br><span class="line">▸   mov▸edx, 9</span><br><span class="line">▸   mov▸ecx, 8</span><br><span class="line">▸   call▸   _Z10fastcall_fiiiiiii</span><br><span class="line">; 对于__fastcall__调用约定，优先使用寄存器，其他参数使用栈存储，同样没看到函数调用者清理栈</span><br><span class="line">; 参数压栈方向: 从右向左</span><br><span class="line"></span><br><span class="line">▸   mov▸eax, 0</span><br><span class="line">▸   leave</span><br><span class="line">▸   .cfi_restore 5</span><br><span class="line">▸   .cfi_def_cfa 4, 4</span><br><span class="line">▸   ret</span><br><span class="line">▸   .cfi_endproc</span><br></pre></td></tr></table></figure>
-stdcall_f函数汇编代码<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">_Z9stdcall_fii:</span><br><span class="line">.LFB1:</span><br><span class="line">▸   .cfi_startproc</span><br><span class="line">▸   endbr32</span><br><span class="line">▸   push▸   ebp</span><br><span class="line">▸   .cfi_def_cfa_offset 8</span><br><span class="line">▸   .cfi_offset 5, -8</span><br><span class="line">▸   mov▸ebp, esp</span><br><span class="line">▸   .cfi_def_cfa_register 5</span><br><span class="line">▸   call▸   __x86.get_pc_thunk.ax</span><br><span class="line">▸   add▸eax, OFFSET FLAT:_GLOBAL_OFFSET_TABLE_</span><br><span class="line"></span><br><span class="line">▸   mov▸eax, DWORD PTR 8[ebp]</span><br><span class="line">▸   imul▸   eax, DWORD PTR 12[ebp]</span><br><span class="line"></span><br><span class="line">▸   pop▸ebp</span><br><span class="line">▸   .cfi_restore 5</span><br><span class="line">▸   .cfi_def_cfa 4, 4</span><br><span class="line"></span><br><span class="line">▸   ret▸8 ; ret 8除了更新eip寄存器之外，还要将esp加8字节</span><br><span class="line">          ; 正好回到了main函数调用stdcall_f时，压入两个int参数的位置</span><br><span class="line">          ; 这就是函数自己完成了栈空间的清理</span><br><span class="line"></span><br><span class="line">▸   .cfi_endproc</span><br></pre></td></tr></table></figure>
-fastcall_f函数汇编代码<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">_Z10fastcall_fiiiiiii:</span><br><span class="line">.LFB2:</span><br><span class="line">▸   .cfi_startproc</span><br><span class="line">▸   endbr32</span><br><span class="line">▸   push▸   ebp</span><br><span class="line">▸   .cfi_def_cfa_offset 8</span><br><span class="line">▸   .cfi_offset 5, -8</span><br><span class="line">▸   mov▸ebp, esp</span><br><span class="line">▸   .cfi_def_cfa_register 5</span><br><span class="line">▸   sub▸esp, 8</span><br><span class="line">▸   call▸   __x86.get_pc_thunk.ax</span><br><span class="line">▸   add▸eax, OFFSET FLAT:_GLOBAL_OFFSET_TABLE_</span><br><span class="line">▸   mov▸DWORD PTR -4[ebp], ecx</span><br><span class="line">▸   mov▸DWORD PTR -8[ebp], edx</span><br><span class="line">▸   mov▸edx, DWORD PTR -4[ebp]</span><br><span class="line">▸   mov▸eax, DWORD PTR -8[ebp]</span><br><span class="line">▸   add▸edx, eax</span><br><span class="line">▸   mov▸eax, DWORD PTR 8[ebp]</span><br><span class="line">▸   add▸edx, eax</span><br><span class="line">▸   mov▸eax, DWORD PTR 12[ebp]</span><br><span class="line">▸   add▸edx, eax</span><br><span class="line">▸   mov▸eax, DWORD PTR 16[ebp]</span><br><span class="line">▸   add▸edx, eax</span><br><span class="line">▸   mov▸eax, DWORD PTR 20[ebp]</span><br><span class="line">▸   add▸edx, eax</span><br><span class="line">▸   mov▸eax, DWORD PTR 24[ebp]</span><br><span class="line">▸   add▸eax, edx</span><br><span class="line">▸   leave</span><br><span class="line">▸   .cfi_restore 5</span><br><span class="line">▸   .cfi_def_cfa 4, 4</span><br><span class="line"></span><br><span class="line">▸   ret▸20 ; 此处的理解同stdcall_f函数，20的原因是调用fastcall_f时，栈压入了5个int参数</span><br><span class="line"></span><br><span class="line">▸   .cfi_endproc</span><br></pre></td></tr></table></figure></li>
-<li><strong>window</strong><h3 id="X64模式下的调用约定"><a href="#X64模式下的调用约定" class="headerlink" title="X64模式下的调用约定"></a>X64模式下的调用约定</h3></li>
-<li><strong>linux</strong><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">g++ -S -m64 -masm=intel test.cpp -Wall</span><br><span class="line"></span><br><span class="line">test.cpp:2:54: warning: ‘cdecl’ attribute ignored [-Wattributes]</span><br><span class="line">  2 | int __attribute__((__cdecl__)) cdecl_f(int c1, int c2) &#123;</span><br><span class="line">    |                                                      ^</span><br><span class="line">test.cpp:6:58: warning: ‘stdcall’ attribute ignored [-Wattributes]</span><br><span class="line">  6 | int __attribute__((__stdcall__)) stdcall_f(int s1, int s2) &#123;</span><br><span class="line">    |                                                          ^</span><br><span class="line">test.cpp:10:100: warning: ‘fastcall’ attribute ignored [-Wattributes]</span><br><span class="line"> 10 | int __attribute__((__fastcall__)) fastcall_f(int f1, int f2, int f3, int f4, int f5, int f6, int f7) &#123;</span><br></pre></td></tr></table></figure>
-同样的代码，当编译为64位模式时，即使调用约定明文指定，也会被忽略。main函数汇编代码段如下：<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">main:</span><br><span class="line">.LFB3:</span><br><span class="line">▸   .cfi_startproc</span><br><span class="line">▸   endbr64</span><br><span class="line">▸   push▸   rbp</span><br><span class="line">▸   .cfi_def_cfa_offset 16</span><br><span class="line">▸   .cfi_offset 6, -16</span><br><span class="line">▸   mov▸rbp, rsp</span><br><span class="line">▸   .cfi_def_cfa_register 6</span><br><span class="line"></span><br><span class="line">▸   mov▸esi, 2</span><br><span class="line">▸   mov▸edi, 1</span><br><span class="line">▸   call▸   _Z7cdecl_fii   ; 与x86相比，并没有使用栈传递参数，而使用寄存器</span><br><span class="line"></span><br><span class="line">▸   mov▸esi, 5</span><br><span class="line">▸   mov▸edi, 4</span><br><span class="line">▸   call▸   _Z9stdcall_fii</span><br><span class="line"></span><br><span class="line">▸   push▸   14    ; 多出的参数，只能使用栈</span><br><span class="line">▸   mov▸r9d, 13   ; 64位函数参数寄存器, 就如下几个</span><br><span class="line">▸   mov▸r8d, 12</span><br><span class="line">▸   mov▸ecx, 11</span><br><span class="line">▸   mov▸edx, 10</span><br><span class="line">▸   mov▸esi, 9</span><br><span class="line">▸   mov▸edi, 8</span><br><span class="line">▸   call▸   _Z10fastcall_fiiiiiii</span><br><span class="line">▸   add▸rsp, 8    ; 使用了栈，就要退回原位置，从这点看在64位下，调用者清理栈</span><br><span class="line"></span><br><span class="line">▸   mov▸eax, 0</span><br><span class="line">▸   leave</span><br><span class="line">▸   .cfi_def_cfa 7, 8</span><br><span class="line">▸   ret</span><br><span class="line">▸   .cfi_endproc</span><br></pre></td></tr></table></figure>
-<h3 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h3></li>
+<p>main函数的汇编代码段</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">main:</span><br><span class="line">.LFB3:</span><br><span class="line">▸   .cfi_startproc</span><br><span class="line">▸   endbr32</span><br><span class="line">▸   push▸   ebp</span><br><span class="line">▸   .cfi_def_cfa_offset 8</span><br><span class="line">▸   .cfi_offset 5, -8</span><br><span class="line">▸   mov▸ebp, esp</span><br><span class="line">▸   .cfi_def_cfa_register 5</span><br><span class="line">▸   call▸   __x86.get_pc_thunk.ax</span><br><span class="line">▸   add▸eax, OFFSET FLAT:_GLOBAL_OFFSET_TABLE_</span><br><span class="line"></span><br><span class="line">▸   push▸   2            ; 2压入栈，esp下移4字节</span><br><span class="line">▸   push▸   1            ; 1压入栈，esp下移4字节</span><br><span class="line">▸   call▸   _Z7cdecl_fii ; call cdecl_f函数</span><br><span class="line">▸   add▸esp, 8           ; esp上移8字节</span><br><span class="line">; 对于__cdecl__调用约定函数，函数调用者清理栈</span><br><span class="line">; 参数压栈方向: 从右向左</span><br><span class="line"></span><br><span class="line">▸   push▸   5</span><br><span class="line">▸   push▸   4</span><br><span class="line">▸   call▸   _Z9stdcall_fii</span><br><span class="line">; 对于__stdcall__调用约定，没看到函数调用者清理栈，参看stdcall_f汇编代码</span><br><span class="line">; 参数压栈方向: 从右向左</span><br><span class="line"></span><br><span class="line">▸   push▸   14</span><br><span class="line">▸   push▸   13</span><br><span class="line">▸   push▸   12</span><br><span class="line">▸   push▸   11</span><br><span class="line">▸   push▸   10</span><br><span class="line">▸   mov▸edx, 9</span><br><span class="line">▸   mov▸ecx, 8</span><br><span class="line">▸   call▸   _Z10fastcall_fiiiiiii</span><br><span class="line">; 对于__fastcall__调用约定，优先使用寄存器，其他参数使用栈存储，同样没看到函数调用者清理栈</span><br><span class="line">; 参数压栈方向: 从右向左</span><br><span class="line"></span><br><span class="line">▸   mov▸eax, 0</span><br><span class="line">▸   leave</span><br><span class="line">▸   .cfi_restore 5</span><br><span class="line">▸   .cfi_def_cfa 4, 4</span><br><span class="line">▸   ret</span><br><span class="line">▸   .cfi_endproc</span><br></pre></td></tr></table></figure>
+<p>stdcall_f函数汇编代码</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">_Z9stdcall_fii:</span><br><span class="line">.LFB1:</span><br><span class="line">▸   .cfi_startproc</span><br><span class="line">▸   endbr32</span><br><span class="line">▸   push▸   ebp</span><br><span class="line">▸   .cfi_def_cfa_offset 8</span><br><span class="line">▸   .cfi_offset 5, -8</span><br><span class="line">▸   mov▸ebp, esp</span><br><span class="line">▸   .cfi_def_cfa_register 5</span><br><span class="line">▸   call▸   __x86.get_pc_thunk.ax</span><br><span class="line">▸   add▸eax, OFFSET FLAT:_GLOBAL_OFFSET_TABLE_</span><br><span class="line"></span><br><span class="line">▸   mov▸eax, DWORD PTR 8[ebp]</span><br><span class="line">▸   imul▸   eax, DWORD PTR 12[ebp]</span><br><span class="line"></span><br><span class="line">▸   pop▸ebp</span><br><span class="line">▸   .cfi_restore 5</span><br><span class="line">▸   .cfi_def_cfa 4, 4</span><br><span class="line"></span><br><span class="line">▸   ret▸8 ; ret 8除了更新eip寄存器之外，还要将esp加8字节</span><br><span class="line">          ; 正好回到了main函数调用stdcall_f时，压入两个int参数的位置</span><br><span class="line">          ; 这就是函数自己完成了栈空间的清理</span><br><span class="line"></span><br><span class="line">▸   .cfi_endproc</span><br></pre></td></tr></table></figure>
+<p>fastcall_f函数汇编代码</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">_Z10fastcall_fiiiiiii:</span><br><span class="line">.LFB2:</span><br><span class="line">▸   .cfi_startproc</span><br><span class="line">▸   endbr32</span><br><span class="line">▸   push▸   ebp</span><br><span class="line">▸   .cfi_def_cfa_offset 8</span><br><span class="line">▸   .cfi_offset 5, -8</span><br><span class="line">▸   mov▸ebp, esp</span><br><span class="line">▸   .cfi_def_cfa_register 5</span><br><span class="line">▸   sub▸esp, 8</span><br><span class="line">▸   call▸   __x86.get_pc_thunk.ax</span><br><span class="line">▸   add▸eax, OFFSET FLAT:_GLOBAL_OFFSET_TABLE_</span><br><span class="line">▸   mov▸DWORD PTR -4[ebp], ecx</span><br><span class="line">▸   mov▸DWORD PTR -8[ebp], edx</span><br><span class="line">▸   mov▸edx, DWORD PTR -4[ebp]</span><br><span class="line">▸   mov▸eax, DWORD PTR -8[ebp]</span><br><span class="line">▸   add▸edx, eax</span><br><span class="line">▸   mov▸eax, DWORD PTR 8[ebp]</span><br><span class="line">▸   add▸edx, eax</span><br><span class="line">▸   mov▸eax, DWORD PTR 12[ebp]</span><br><span class="line">▸   add▸edx, eax</span><br><span class="line">▸   mov▸eax, DWORD PTR 16[ebp]</span><br><span class="line">▸   add▸edx, eax</span><br><span class="line">▸   mov▸eax, DWORD PTR 20[ebp]</span><br><span class="line">▸   add▸edx, eax</span><br><span class="line">▸   mov▸eax, DWORD PTR 24[ebp]</span><br><span class="line">▸   add▸eax, edx</span><br><span class="line">▸   leave</span><br><span class="line">▸   .cfi_restore 5</span><br><span class="line">▸   .cfi_def_cfa 4, 4</span><br><span class="line"></span><br><span class="line">▸   ret▸20 ; 此处的理解同stdcall_f函数，20的原因是调用fastcall_f时，栈压入了5个int参数</span><br><span class="line"></span><br><span class="line">▸   .cfi_endproc</span><br></pre></td></tr></table></figure>
+
+<h4 id="window"><a href="#window" class="headerlink" title="window"></a>window</h4><h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><table>
+<thead>
+<tr>
+<th>约定方式</th>
+<th>函数传参方式</th>
+<th>空间清理方和方式</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>stdcall</code></td>
+<td>从右到左</td>
+<td>函数自身</td>
+</tr>
+<tr>
+<td><code>cdecl</code></td>
+<td>从右到左</td>
+<td>函数调用者</td>
+</tr>
+<tr>
+<td><code>fastcall</code></td>
+<td>从右到左，先使用寄存器，寄存器不够，再使用栈</td>
+<td>函数调用者</td>
+</tr>
+</tbody></table>
+<h4 id="讨论"><a href="#讨论" class="headerlink" title="讨论"></a>讨论</h4><p>之前面试的时候，有面试官问过<code>__stdcall</code>和<code>__cdecl</code>之间的区别：现在我最新的理解是<code>__cdecl</code>规定函数调用者去实现栈空间的清理，意味着调用函数的每个地方都有栈清理，生成的文件必然要大，但正是这种约定是支持可变参数的。<code>__stdcall</code>函数自身清理栈空间，那么自然生成的文件相比<code>__cdecl</code>而言要小，因为调用函数的地方只有一句<code>call method</code>，但可变参数个数的函数形式必然是支持不了的，因为<code>__stdcall</code>调用约定形式的函数，在汇编时无法确定要清理多大的栈空间<code>ret ??</code>。</p>
+<p><a href="https://www.cnblogs.com/sober/archive/2009/09/01/1558178.html">参考资料 C/C++中什么时候需要使用__stdcall?</a></p>
+<p>或许还有安全的考虑，<code>__stdcall</code>函数是自己清理栈空间，什么时候清理，函数自己是清楚的。<code>__cdecl</code>函数栈空间是否有效，函数是不知道的，只是单纯去访问。</p>
+<h3 id="X64模式下的调用约定"><a href="#X64模式下的调用约定" class="headerlink" title="X64模式下的调用约定"></a>X64模式下的调用约定</h3><h4 id="linux-1"><a href="#linux-1" class="headerlink" title="linux"></a>linux</h4><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">g++ -S -m64 -masm=intel test.cpp -Wall</span><br><span class="line"></span><br><span class="line">test.cpp:2:54: warning: ‘cdecl’ attribute ignored [-Wattributes]</span><br><span class="line">  2 | int __attribute__((__cdecl__)) cdecl_f(int c1, int c2) &#123;</span><br><span class="line">    |                                                      ^</span><br><span class="line">test.cpp:6:58: warning: ‘stdcall’ attribute ignored [-Wattributes]</span><br><span class="line">  6 | int __attribute__((__stdcall__)) stdcall_f(int s1, int s2) &#123;</span><br><span class="line">    |                                                          ^</span><br><span class="line">test.cpp:10:100: warning: ‘fastcall’ attribute ignored [-Wattributes]</span><br><span class="line"> 10 | int __attribute__((__fastcall__)) fastcall_f(int f1, int f2, int f3, int f4, int f5, int f6, int f7) &#123;</span><br></pre></td></tr></table></figure>
+<p>同样的代码，当编译为64位模式时，即使调用约定明文指定，也会被忽略。main函数汇编代码段如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">main:</span><br><span class="line">.LFB3:</span><br><span class="line">▸   .cfi_startproc</span><br><span class="line">▸   endbr64</span><br><span class="line">▸   push▸   rbp</span><br><span class="line">▸   .cfi_def_cfa_offset 16</span><br><span class="line">▸   .cfi_offset 6, -16</span><br><span class="line">▸   mov▸rbp, rsp</span><br><span class="line">▸   .cfi_def_cfa_register 6</span><br><span class="line"></span><br><span class="line">▸   mov▸esi, 2</span><br><span class="line">▸   mov▸edi, 1</span><br><span class="line">▸   call▸   _Z7cdecl_fii   ; 与x86相比，并没有使用栈传递参数，而使用寄存器</span><br><span class="line"></span><br><span class="line">▸   mov▸esi, 5</span><br><span class="line">▸   mov▸edi, 4</span><br><span class="line">▸   call▸   _Z9stdcall_fii</span><br><span class="line"></span><br><span class="line">▸   push▸   14    ; 多出的参数，只能使用栈</span><br><span class="line">▸   mov▸r9d, 13   ; 64位函数参数寄存器, 就如下几个</span><br><span class="line">▸   mov▸r8d, 12</span><br><span class="line">▸   mov▸ecx, 11</span><br><span class="line">▸   mov▸edx, 10</span><br><span class="line">▸   mov▸esi, 9</span><br><span class="line">▸   mov▸edi, 8</span><br><span class="line">▸   call▸   _Z10fastcall_fiiiiiii</span><br><span class="line">▸   add▸rsp, 8    ; 使用了栈，就要退回原位置，从这点看在64位下，调用者清理栈</span><br><span class="line"></span><br><span class="line">▸   mov▸eax, 0</span><br><span class="line">▸   leave</span><br><span class="line">▸   .cfi_def_cfa 7, 8</span><br><span class="line">▸   ret</span><br><span class="line">▸   .cfi_endproc</span><br></pre></td></tr></table></figure>
+
+<h3 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h3><ul>
 <li>x64模式下的默认函数调用约定是什么呢？</li>
 <li>x64模式下，好像是函数调用者清理栈(当然是函数参数寄存器都占用完，用栈存储其他函数参数)</li>
 </ul>
@@ -27,6 +58,48 @@ fastcall_f函数汇编代码<figure class="highlight plaintext"><table><tr><td c
       </categories>
       <tags>
         <tag>汇编</tag>
+        <tag>Call Convention</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>docker日常使用</title>
+    <url>/2021/07/26/docker/</url>
+    <content><![CDATA[<h2 id="docker服务创建的文件和文件夹，host具有相同的权限"><a href="#docker服务创建的文件和文件夹，host具有相同的权限" class="headerlink" title="docker服务创建的文件和文件夹，host具有相同的权限"></a>docker服务创建的文件和文件夹，host具有相同的权限</h2><ol>
+<li>近日想搭个人静态网站，搜索最快的实现方式，随即就看到了hexo这种技术方案。发挥程序员最大特点“懒”，故想使用docker制作个运行环境，免除重装系统时的痛苦或者快速分享给周围朋友，岂不美哉。</li>
+<li>我的想法是：markdown的编写还是在host上完成，运行docker服务编译生成静态网站文件。这就遇到了点问题！<blockquote>
+<p>当我们用如下的命令启动docker服务时, 在容器内[container dir]创建文件或者文件夹，所属用户和组必然是root。<br>那么，在host这侧必然是只读状态，除非host也是root用户。</p>
+</blockquote>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">docker run -v [host dir]:[container dir] -it [docker_image] /bin/bash</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>解决方式，通过创建服务时，传入host的用户id和组id</p>
+</blockquote>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">docker run -v [host dir]:[container dir] -u [uid]:[gid] -it [docker_image] /bin/bash</span><br></pre></td></tr></table></figure></li>
+</ol>
+]]></content>
+      <categories>
+        <category>日常</category>
+      </categories>
+      <tags>
+        <tag>docker</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>linux日常</title>
+    <url>/2021/07/26/linux/</url>
+    <content><![CDATA[<h2 id="git小技巧"><a href="#git小技巧" class="headerlink" title="git小技巧"></a>git小技巧</h2><p>有时个人开发、公司项目会在同一台电脑上，所以要区分开git账户信息。今天分享一下小技巧：可以在$HOME下的.gitconfig(<strong>全局git配置文件</strong>)增加如下的字段信息<strong>includeIf</strong>，其中${project path}是指工作仓库存放的本地路径，<code>.gitconfig.work</code>与.gitconfig同处一个目录下。</p>
+<figure class="highlight ini"><table><tr><td class="code"><pre><span class="line"><span class="section">[includeIf &quot;gitdir:$&#123;project path&#125;&quot;]</span></span><br><span class="line">	<span class="attr">path</span> = .gitconfig.work</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight ini"><table><tr><td class="code"><pre><span class="line"><span class="comment"># .gitconfig.work</span></span><br><span class="line"><span class="section">[user]</span></span><br><span class="line">	<span class="attr">name</span> = work_name</span><br><span class="line">	<span class="attr">email</span> = profile@company.com</span><br></pre></td></tr></table></figure>
+
+<h2 id="查看当前linux下的用户信息"><a href="#查看当前linux下的用户信息" class="headerlink" title="查看当前linux下的用户信息"></a>查看当前linux下的用户信息</h2><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">cat /etc/passwd</span><br><span class="line"><span class="comment"># 用户名:加密密码:用户id:组id:用户信息:家目录:shell类型</span></span><br><span class="line">root:x:0:0:root:/root:/bin/bash</span><br><span class="line">daemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin</span><br><span class="line">bin:x:2:2:bin:/bin:/usr/sbin/nologin</span><br><span class="line">sys:x:3:3:sys:/dev:/usr/sbin/nologin</span><br><span class="line"></span><br><span class="line"><span class="comment"># 可以如下命令查找当前用户</span></span><br><span class="line">cat /etc/passwd | grep <span class="variable">$USER</span></span><br></pre></td></tr></table></figure>
+<h2 id="sed替换指定文本"><a href="#sed替换指定文本" class="headerlink" title="sed替换指定文本"></a>sed替换指定文本</h2><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">cat replace.txt</span><br><span class="line">https://github.com/xxx/yyy.git</span><br><span class="line"></span><br><span class="line"><span class="comment"># 欲将github.com替换为gitclone.com/github.com</span></span><br><span class="line">sed -i <span class="string">&#x27;s#github.com#gitclone.com/github.com#&#x27;</span> replace.txt</span><br><span class="line"><span class="comment"># 欲生成新文件</span></span><br><span class="line">sed -i <span class="string">&#x27;s#github.com#gitclone.com/github.com#&#x27;</span> replace.txt &gt; new.txt</span><br></pre></td></tr></table></figure>
+
+]]></content>
+      <categories>
+        <category>日常</category>
+      </categories>
+      <tags>
+        <tag>shell</tag>
       </tags>
   </entry>
   <entry>
@@ -80,39 +153,30 @@ fastcall_f函数汇编代码<figure class="highlight plaintext"><table><tr><td c
       </tags>
   </entry>
   <entry>
-    <title>docker日常使用</title>
-    <url>/2021/07/26/docker/</url>
-    <content><![CDATA[<h2 id="docker服务创建的文件和文件夹，host具有相同的权限"><a href="#docker服务创建的文件和文件夹，host具有相同的权限" class="headerlink" title="docker服务创建的文件和文件夹，host具有相同的权限"></a>docker服务创建的文件和文件夹，host具有相同的权限</h2><ol>
-<li>近日想搭个人静态网站，搜索最快的实现方式，随即就看到了hexo这种技术方案。发挥程序员最大特点“懒”，故想使用docker制作个运行环境，免除重装系统时的痛苦或者快速分享给周围朋友，岂不美哉。</li>
-<li>我的想法是：markdown的编写还是在host上完成，运行docker服务编译生成静态网站文件。这就遇到了点问题！<blockquote>
-<p>当我们用如下的命令启动docker服务时, 在容器内[container dir]创建文件或者文件夹，所属用户和组必然是root。<br>那么，在host这侧必然是只读状态，除非host也是root用户。</p>
-</blockquote>
-<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">docker run -v [host dir]:[container dir] -it [docker_image] /bin/bash</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>解决方式，通过创建服务时，传入host的用户id和组id</p>
-</blockquote>
-<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">docker run -v [host dir]:[container dir] -u [uid]:[gid] -it [docker_image] /bin/bash</span><br></pre></td></tr></table></figure></li>
-</ol>
+    <title>C++知识点</title>
+    <url>/2021/09/11/cxx-cast/</url>
+    <content><![CDATA[<h2 id="类型转换"><a href="#类型转换" class="headerlink" title="类型转换"></a>类型转换</h2><p><code>static_cast</code><br><code>dynamic_cast</code><br><code>const_cast</code><br><code>reinterpret_cast</code></p>
+<p>static_cast </p>
+<ul>
+<li><p>基本数据类型之间的转换</p>
+</li>
+<li><p>类间的转换：基类和派生类间的引用、指针<br>上行转换 （ derived –&gt; base ) 是安全的；下行转换( base –&gt; derived) 是不安全的</p>
+</li>
+</ul>
 ]]></content>
       <categories>
-        <category>日常</category>
+        <category>c++</category>
       </categories>
       <tags>
-        <tag>docker</tag>
+        <tag>类型转换cast</tag>
       </tags>
   </entry>
   <entry>
-    <title>linux日常</title>
-    <url>/2021/07/26/linux/</url>
-    <content><![CDATA[<h2 id="查看当前linux下的用户信息"><a href="#查看当前linux下的用户信息" class="headerlink" title="查看当前linux下的用户信息"></a>查看当前linux下的用户信息</h2><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">cat /etc/passwd</span><br><span class="line"><span class="comment"># 用户名:加密密码:用户id:组id:用户信息:家目录:shell类型</span></span><br><span class="line">root:x:0:0:root:/root:/bin/bash</span><br><span class="line">daemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin</span><br><span class="line">bin:x:2:2:bin:/bin:/usr/sbin/nologin</span><br><span class="line">sys:x:3:3:sys:/dev:/usr/sbin/nologin</span><br><span class="line"></span><br><span class="line"><span class="comment"># 可以如下命令查找当前用户</span></span><br><span class="line">cat /etc/passwd | grep <span class="variable">$USER</span></span><br></pre></td></tr></table></figure>
-<h2 id="sed替换指定文本"><a href="#sed替换指定文本" class="headerlink" title="sed替换指定文本"></a>sed替换指定文本</h2><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">cat replace.txt</span><br><span class="line">https://github.com/xxx/yyy.git</span><br><span class="line"></span><br><span class="line"><span class="comment"># 欲将github.com替换为gitclone.com/github.com</span></span><br><span class="line">sed -i <span class="string">&#x27;s#github.com#gitclone.com/github.com#&#x27;</span> replace.txt</span><br><span class="line"><span class="comment"># 欲生成新文件</span></span><br><span class="line">sed -i <span class="string">&#x27;s#github.com#gitclone.com/github.com#&#x27;</span> replace.txt &gt; new.txt</span><br></pre></td></tr></table></figure>
-
+    <title></title>
+    <url>/1970/01/01/%E5%AD%A6%E4%B9%A0/</url>
+    <content><![CDATA[<p>宏 和 常量 的区别</p>
+<p>1.宏在预处理前进行替换<br>2.const在编译期间进行替换<br>3.const有类型判断，合法校验</p>
+<p>mutable 知识点</p>
 ]]></content>
-      <categories>
-        <category>日常</category>
-      </categories>
-      <tags>
-        <tag>shell</tag>
-      </tags>
   </entry>
 </search>
