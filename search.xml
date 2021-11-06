@@ -1,6 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>C++知识点</title>
+    <url>/2021/09/11/cxx-cast/</url>
+    <content><![CDATA[<h2 id="类型转换"><a href="#类型转换" class="headerlink" title="类型转换"></a>类型转换</h2><p><code>static_cast</code><br><code>dynamic_cast</code><br><code>const_cast</code><br><code>reinterpret_cast</code></p>
+<p>static_cast </p>
+<ul>
+<li><p>基本数据类型之间的转换</p>
+</li>
+<li><p>类间的转换：基类和派生类间的引用、指针<br>上行转换 （ derived –&gt; base ) 是安全的；下行转换( base –&gt; derived) 是不安全的</p>
+</li>
+</ul>
+]]></content>
+      <categories>
+        <category>c++</category>
+      </categories>
+      <tags>
+        <tag>类型转换cast</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>以汇编的角度理解调用约定</title>
     <url>/2021/08/07/assemble_cc/</url>
     <content><![CDATA[<blockquote>
@@ -59,25 +78,6 @@
       <tags>
         <tag>汇编</tag>
         <tag>Call Convention</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>C++知识点</title>
-    <url>/2021/09/11/cxx-cast/</url>
-    <content><![CDATA[<h2 id="类型转换"><a href="#类型转换" class="headerlink" title="类型转换"></a>类型转换</h2><p><code>static_cast</code><br><code>dynamic_cast</code><br><code>const_cast</code><br><code>reinterpret_cast</code></p>
-<p>static_cast </p>
-<ul>
-<li><p>基本数据类型之间的转换</p>
-</li>
-<li><p>类间的转换：基类和派生类间的引用、指针<br>上行转换 （ derived –&gt; base ) 是安全的；下行转换( base –&gt; derived) 是不安全的</p>
-</li>
-</ul>
-]]></content>
-      <categories>
-        <category>c++</category>
-      </categories>
-      <tags>
-        <tag>类型转换cast</tag>
       </tags>
   </entry>
   <entry>
@@ -153,14 +153,6 @@
       </tags>
   </entry>
   <entry>
-    <title></title>
-    <url>/1970/01/01/%E5%AD%A6%E4%B9%A0/</url>
-    <content><![CDATA[<p>宏 和 常量 的区别</p>
-<p>1.宏在预处理前进行替换<br>2.const在编译期间进行替换<br>3.const有类型判断，合法校验</p>
-<p>mutable 知识点</p>
-]]></content>
-  </entry>
-  <entry>
     <title>linux日常</title>
     <url>/2021/07/26/linux/</url>
     <content><![CDATA[<h2 id="git小技巧"><a href="#git小技巧" class="headerlink" title="git小技巧"></a>git小技巧</h2><p>有时个人开发、公司项目会在同一台电脑上，所以要区分开git账户信息。今天分享一下小技巧：可以在$HOME下的.gitconfig(<strong>全局git配置文件</strong>)增加如下的字段信息<strong>includeIf</strong>，其中${project path}是指工作仓库存放的本地路径，<code>.gitconfig.work</code>与.gitconfig同处一个目录下。</p>
@@ -178,5 +170,13 @@
       <tags>
         <tag>shell</tag>
       </tags>
+  </entry>
+  <entry>
+    <title></title>
+    <url>/1970/01/01/%E5%AD%A6%E4%B9%A0/</url>
+    <content><![CDATA[<p>宏 和 常量 的区别</p>
+<p>1.宏在预处理前进行替换<br>2.const在编译期间进行替换<br>3.const有类型判断，合法校验</p>
+<p>mutable 知识点</p>
+]]></content>
   </entry>
 </search>
