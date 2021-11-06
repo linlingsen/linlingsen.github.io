@@ -62,6 +62,25 @@
       </tags>
   </entry>
   <entry>
+    <title>C++知识点</title>
+    <url>/2021/09/11/cxx-cast/</url>
+    <content><![CDATA[<h2 id="类型转换"><a href="#类型转换" class="headerlink" title="类型转换"></a>类型转换</h2><p><code>static_cast</code><br><code>dynamic_cast</code><br><code>const_cast</code><br><code>reinterpret_cast</code></p>
+<p>static_cast </p>
+<ul>
+<li><p>基本数据类型之间的转换</p>
+</li>
+<li><p>类间的转换：基类和派生类间的引用、指针<br>上行转换 （ derived –&gt; base ) 是安全的；下行转换( base –&gt; derived) 是不安全的</p>
+</li>
+</ul>
+]]></content>
+      <categories>
+        <category>c++</category>
+      </categories>
+      <tags>
+        <tag>类型转换cast</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>docker日常使用</title>
     <url>/2021/07/26/docker/</url>
     <content><![CDATA[<h2 id="docker服务创建的文件和文件夹，host具有相同的权限"><a href="#docker服务创建的文件和文件夹，host具有相同的权限" class="headerlink" title="docker服务创建的文件和文件夹，host具有相同的权限"></a>docker服务创建的文件和文件夹，host具有相同的权限</h2><ol>
@@ -81,25 +100,6 @@
       </categories>
       <tags>
         <tag>docker</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>linux日常</title>
-    <url>/2021/07/26/linux/</url>
-    <content><![CDATA[<h2 id="git小技巧"><a href="#git小技巧" class="headerlink" title="git小技巧"></a>git小技巧</h2><p>有时个人开发、公司项目会在同一台电脑上，所以要区分开git账户信息。今天分享一下小技巧：可以在$HOME下的.gitconfig(<strong>全局git配置文件</strong>)增加如下的字段信息<strong>includeIf</strong>，其中${project path}是指工作仓库存放的本地路径，<code>.gitconfig.work</code>与.gitconfig同处一个目录下。</p>
-<figure class="highlight ini"><table><tr><td class="code"><pre><span class="line"><span class="section">[includeIf &quot;gitdir:$&#123;project path&#125;&quot;]</span></span><br><span class="line">	<span class="attr">path</span> = .gitconfig.work</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight ini"><table><tr><td class="code"><pre><span class="line"><span class="comment"># .gitconfig.work</span></span><br><span class="line"><span class="section">[user]</span></span><br><span class="line">	<span class="attr">name</span> = work_name</span><br><span class="line">	<span class="attr">email</span> = profile@company.com</span><br></pre></td></tr></table></figure>
-
-<h2 id="查看当前linux下的用户信息"><a href="#查看当前linux下的用户信息" class="headerlink" title="查看当前linux下的用户信息"></a>查看当前linux下的用户信息</h2><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">cat /etc/passwd</span><br><span class="line"><span class="comment"># 用户名:加密密码:用户id:组id:用户信息:家目录:shell类型</span></span><br><span class="line">root:x:0:0:root:/root:/bin/bash</span><br><span class="line">daemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin</span><br><span class="line">bin:x:2:2:bin:/bin:/usr/sbin/nologin</span><br><span class="line">sys:x:3:3:sys:/dev:/usr/sbin/nologin</span><br><span class="line"></span><br><span class="line"><span class="comment"># 可以如下命令查找当前用户</span></span><br><span class="line">cat /etc/passwd | grep <span class="variable">$USER</span></span><br></pre></td></tr></table></figure>
-<h2 id="sed替换指定文本"><a href="#sed替换指定文本" class="headerlink" title="sed替换指定文本"></a>sed替换指定文本</h2><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">cat replace.txt</span><br><span class="line">https://github.com/xxx/yyy.git</span><br><span class="line"></span><br><span class="line"><span class="comment"># 欲将github.com替换为gitclone.com/github.com</span></span><br><span class="line">sed -i <span class="string">&#x27;s#github.com#gitclone.com/github.com#&#x27;</span> replace.txt</span><br><span class="line"><span class="comment"># 欲生成新文件</span></span><br><span class="line">sed -i <span class="string">&#x27;s#github.com#gitclone.com/github.com#&#x27;</span> replace.txt &gt; new.txt</span><br></pre></td></tr></table></figure>
-
-]]></content>
-      <categories>
-        <category>日常</category>
-      </categories>
-      <tags>
-        <tag>shell</tag>
       </tags>
   </entry>
   <entry>
@@ -153,30 +153,30 @@
       </tags>
   </entry>
   <entry>
-    <title>C++知识点</title>
-    <url>/2021/09/11/cxx-cast/</url>
-    <content><![CDATA[<h2 id="类型转换"><a href="#类型转换" class="headerlink" title="类型转换"></a>类型转换</h2><p><code>static_cast</code><br><code>dynamic_cast</code><br><code>const_cast</code><br><code>reinterpret_cast</code></p>
-<p>static_cast </p>
-<ul>
-<li><p>基本数据类型之间的转换</p>
-</li>
-<li><p>类间的转换：基类和派生类间的引用、指针<br>上行转换 （ derived –&gt; base ) 是安全的；下行转换( base –&gt; derived) 是不安全的</p>
-</li>
-</ul>
-]]></content>
-      <categories>
-        <category>c++</category>
-      </categories>
-      <tags>
-        <tag>类型转换cast</tag>
-      </tags>
-  </entry>
-  <entry>
     <title></title>
     <url>/1970/01/01/%E5%AD%A6%E4%B9%A0/</url>
     <content><![CDATA[<p>宏 和 常量 的区别</p>
 <p>1.宏在预处理前进行替换<br>2.const在编译期间进行替换<br>3.const有类型判断，合法校验</p>
 <p>mutable 知识点</p>
 ]]></content>
+  </entry>
+  <entry>
+    <title>linux日常</title>
+    <url>/2021/07/26/linux/</url>
+    <content><![CDATA[<h2 id="git小技巧"><a href="#git小技巧" class="headerlink" title="git小技巧"></a>git小技巧</h2><p>有时个人开发、公司项目会在同一台电脑上，所以要区分开git账户信息。今天分享一下小技巧：可以在$HOME下的.gitconfig(<strong>全局git配置文件</strong>)增加如下的字段信息<strong>includeIf</strong>，其中${project path}是指工作仓库存放的本地路径，<code>.gitconfig.work</code>与.gitconfig同处一个目录下。</p>
+<figure class="highlight ini"><table><tr><td class="code"><pre><span class="line"><span class="section">[includeIf &quot;gitdir:$&#123;project path&#125;&quot;]</span></span><br><span class="line">	<span class="attr">path</span> = .gitconfig.work</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight ini"><table><tr><td class="code"><pre><span class="line"><span class="comment"># .gitconfig.work</span></span><br><span class="line"><span class="section">[user]</span></span><br><span class="line">	<span class="attr">name</span> = work_name</span><br><span class="line">	<span class="attr">email</span> = profile@company.com</span><br></pre></td></tr></table></figure>
+
+<h2 id="查看当前linux下的用户信息"><a href="#查看当前linux下的用户信息" class="headerlink" title="查看当前linux下的用户信息"></a>查看当前linux下的用户信息</h2><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">cat /etc/passwd</span><br><span class="line"><span class="comment"># 用户名:加密密码:用户id:组id:用户信息:家目录:shell类型</span></span><br><span class="line">root:x:0:0:root:/root:/bin/bash</span><br><span class="line">daemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin</span><br><span class="line">bin:x:2:2:bin:/bin:/usr/sbin/nologin</span><br><span class="line">sys:x:3:3:sys:/dev:/usr/sbin/nologin</span><br><span class="line"></span><br><span class="line"><span class="comment"># 可以如下命令查找当前用户</span></span><br><span class="line">cat /etc/passwd | grep <span class="variable">$USER</span></span><br></pre></td></tr></table></figure>
+<h2 id="sed替换指定文本"><a href="#sed替换指定文本" class="headerlink" title="sed替换指定文本"></a>sed替换指定文本</h2><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">cat replace.txt</span><br><span class="line">https://github.com/xxx/yyy.git</span><br><span class="line"></span><br><span class="line"><span class="comment"># 欲将github.com替换为gitclone.com/github.com</span></span><br><span class="line">sed -i <span class="string">&#x27;s#github.com#gitclone.com/github.com#&#x27;</span> replace.txt</span><br><span class="line"><span class="comment"># 欲生成新文件</span></span><br><span class="line">sed -i <span class="string">&#x27;s#github.com#gitclone.com/github.com#&#x27;</span> replace.txt &gt; new.txt</span><br></pre></td></tr></table></figure>
+
+]]></content>
+      <categories>
+        <category>日常</category>
+      </categories>
+      <tags>
+        <tag>shell</tag>
+      </tags>
   </entry>
 </search>
